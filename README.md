@@ -1,6 +1,14 @@
 # AI Rephrase
 
-A macOS menu bar app that rephrases selected text using Apple Intelligence. Works in any application — select text, hit a shortcut, get a polished version instantly pasted back.
+A macOS menu bar app that rephrases selected text using on-device AI. Works in any application — select text, hit a shortcut, get a polished version instantly pasted back.
+
+Uses Apple Intelligence when available, with automatic fallback to local Ollama models.
+
+<p align="center">
+  <img src="screenshots/apple.png" width="320" alt="Apple Intelligence backend">
+  &nbsp;&nbsp;
+  <img src="screenshots/ollama.png" width="320" alt="Ollama backend">
+</p>
 
 <p align="center">
   <img src="screenshots/rephrase-result.png" width="320" alt="Rephrase result">
@@ -10,32 +18,41 @@ A macOS menu bar app that rephrases selected text using Apple Intelligence. Work
 
 ## Why?
 
-Writing in a non-native language means constantly second-guessing your phrasing. AI Rephrase fixes that — select awkward text anywhere (Slack, email, docs, IDE), press one shortcut, and it gets rephrased in-place using Apple's on-device language model. No API keys, no cloud, no copy-pasting into ChatGPT.
+Writing in a non-native language means constantly second-guessing your phrasing. AI Rephrase fixes that — select awkward text anywhere (Slack, email, docs, IDE), press one shortcut, and it gets rephrased in-place. No API keys, no cloud, no copy-pasting into ChatGPT.
 
 ## How It Works
 
 1. Select text in **any** application
 2. Press **⌥⇧⌘R** (customizable)
-3. App copies the selection, sends it to Apple Intelligence for rephrasing
+3. App copies the selection, sends it to on-device AI for rephrasing
 4. Rephrased text is automatically pasted back
-
-Everything happens on-device through Apple's `FoundationModels` framework — your text never leaves your Mac.
 
 ## Features
 
 - **Works everywhere** — any app that supports text selection
 - **One shortcut** — ⌥⇧⌘R (customizable in the menu bar popover)
-- **On-device AI** — uses Apple Intelligence, no API keys, no internet required
+- **Dual backend** — Apple Intelligence (on-device) or Ollama (local models)
+- **Auto-detection** — picks the best available backend, manual switch anytime
+- **Ollama model picker** — choose any locally installed model (gemma3, llama, etc.)
 - **Persistent history** — browse all past rephrasings with search
 - **Copy original or rephrased** — from the history window
 - **Menu bar app** — no dock icon, stays out of your way
 - **Native macOS** — SwiftUI, zero external API dependencies
 
+## Backends
+
+| Backend | When it's used |
+|---|---|
+| **Apple Intelligence** | macOS 26+, Apple Silicon, Apple Intelligence enabled, language set to English |
+| **Ollama** | Fallback when Apple Intelligence is unavailable (e.g. non-English locale, disabled by policy) or manually selected |
+
+You can switch between backends at any time via the dropdown in the menu bar popover.
+
 ## Requirements
 
 - **macOS 26 (Tahoe)** or later
 - **Apple Silicon** Mac (M1 or later)
-- **Apple Intelligence** must be enabled
+- **Apple Intelligence** enabled — or **Ollama** running locally (`ollama serve`)
 
 ### Enabling Apple Intelligence
 
@@ -44,6 +61,13 @@ Everything happens on-device through Apple's `FoundationModels` framework — yo
 3. If you see a language mismatch warning — set both Mac language and Siri language to **English (US)**
 4. Wait for the on-device model to download (may take a few minutes on first setup)
 5. Grant **Accessibility** permission to AiRephrase in **System Settings → Privacy & Security → Accessibility**
+
+### Using Ollama as fallback
+
+1. Install Ollama: `brew install ollama`
+2. Pull a model: `ollama pull gemma3:12b`
+3. Start the server: `ollama serve`
+4. AI Rephrase will auto-detect Ollama if Apple Intelligence is unavailable
 
 ## Install
 

@@ -45,6 +45,42 @@ struct MenuBarView: View {
 
             Divider()
 
+            // Backend selector
+            HStack(spacing: 6) {
+                Circle()
+                    .fill(service.activeBackend == .none ? .red : .green)
+                    .frame(width: 7, height: 7)
+
+                Picker("", selection: Binding(
+                    get: { service.activeBackend },
+                    set: { newVal in Task { await service.switchBackend(to: newVal) } }
+                )) {
+                    if service.appleIntelligenceAvailable {
+                        Text("Apple Intelligence").tag(RephraseBackend.appleIntelligence)
+                    }
+                    if service.ollamaAvailable {
+                        Text("Ollama").tag(RephraseBackend.ollama)
+                    }
+                    if !service.appleIntelligenceAvailable && !service.ollamaAvailable {
+                        Text("None").tag(RephraseBackend.none)
+                    }
+                }
+                .labelsHidden()
+                .fixedSize()
+                .controlSize(.small)
+
+                if service.activeBackend == .ollama && !service.availableOllamaModels.isEmpty {
+                    Picker("", selection: $service.ollamaModel) {
+                        ForEach(service.availableOllamaModels, id: \.self) { model in
+                            Text(model).tag(model)
+                        }
+                    }
+                    .labelsHidden()
+                    .fixedSize()
+                    .controlSize(.small)
+                }
+            }
+
             if let status = service.statusMessage {
                 HStack(spacing: 6) {
                     if service.isProcessing {
@@ -76,7 +112,7 @@ struct MenuBarView: View {
 
             HStack {
                 Button("Rephrase Selected Text") {
-                    Task { await service.rephraseSelectedText() }
+                    service.triggerRephrase()
                 }
                 .keyboardShortcut("r", modifiers: [.command])
                 .disabled(service.isProcessing)
@@ -97,8 +133,10 @@ struct MenuBarView: View {
         .frame(width: 360)
         .onAppear {
             service.historyStore = history
+            ClipboardManager.requestAccessibilityIfNeeded()
+            Task { await service.detectBackend() }
             KeyboardShortcuts.onKeyUp(for: .triggerRephrase) {
-                Task { await service.rephraseSelectedText() }
+                service.triggerRephrase()
             }
         }
     }

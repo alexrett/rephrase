@@ -1,12 +1,26 @@
 import AppKit
 import Carbon.HIToolbox
+import ApplicationServices
 
 @MainActor
 enum ClipboardManager {
 
+    /// Prompt for Accessibility permission (call once at startup)
+    nonisolated static func requestAccessibilityIfNeeded() {
+        let opts = ["AXTrustedCheckOptionPrompt": true] as CFDictionary
+        _ = AXIsProcessTrustedWithOptions(opts)
+    }
+
+    /// Silent check
+    nonisolated static func hasAccessibility() -> Bool {
+        return AXIsProcessTrusted()
+    }
+
     // MARK: - Copy selected text (simulates ⌘C)
 
     static func copySelectedText() async -> String? {
+        guard hasAccessibility() else { return nil }
+
         // Deactivate our app so the previous app gets focus back
         NSApp.hide(nil)
 
