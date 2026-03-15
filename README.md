@@ -2,7 +2,7 @@
 
 A macOS menu bar app that rephrases selected text using on-device AI. Works in any application — select text, hit a shortcut, get a polished version instantly pasted back.
 
-Uses Apple Intelligence when available, with automatic fallback to local Ollama models.
+Supports Ollama (recommended) and Apple Intelligence. Everything runs locally — no API keys, no cloud.
 
 <p align="center">
   <img src="screenshots/apple.png" width="320" alt="Apple Intelligence backend">
@@ -41,10 +41,10 @@ Writing in a non-native language means constantly second-guessing your phrasing.
 
 ## Backends
 
-| Backend | When it's used |
+| Backend | Recommendation |
 |---|---|
-| **Apple Intelligence** | macOS 26+, Apple Silicon, Apple Intelligence enabled, language set to English |
-| **Ollama** | Fallback when Apple Intelligence is unavailable (e.g. non-English locale, disabled by policy) or manually selected |
+| **Ollama** | **Recommended.** Works with any language, reliable results. Use `gemma3:12b` or similar. |
+| **Apple Intelligence** | Limited. English only, ~3B model struggles with rephrasing (tends to answer questions instead), frequently triggers false-positive content filters. |
 
 You can switch between backends at any time via the dropdown in the menu bar popover.
 
@@ -52,22 +52,26 @@ You can switch between backends at any time via the dropdown in the menu bar pop
 
 - **macOS 26 (Tahoe)** or later
 - **Apple Silicon** Mac (M1 or later)
-- **Apple Intelligence** enabled — or **Ollama** running locally (`ollama serve`)
+- **Ollama** running locally (recommended) — or **Apple Intelligence** enabled
 
-### Enabling Apple Intelligence
+### Setting up Ollama (recommended)
+
+```bash
+brew install ollama
+ollama pull gemma3:12b
+ollama serve
+```
+
+AI Rephrase will detect Ollama automatically on launch.
+
+### Apple Intelligence (limited)
+
+The built-in Apple model is small (~3B params). It only supports English, may refuse to process some text, and sometimes answers questions instead of rephrasing them. If you still want to use it:
 
 1. Open **System Settings → Apple Intelligence & Siri**
-2. Make sure Apple Intelligence is turned **on**
-3. If you see a language mismatch warning — set both Mac language and Siri language to **English (US)**
-4. Wait for the on-device model to download (may take a few minutes on first setup)
-5. Grant **Accessibility** permission to AiRephrase in **System Settings → Privacy & Security → Accessibility**
-
-### Using Ollama as fallback
-
-1. Install Ollama: `brew install ollama`
-2. Pull a model: `ollama pull gemma3:12b`
-3. Start the server: `ollama serve`
-4. AI Rephrase will auto-detect Ollama if Apple Intelligence is unavailable
+2. Turn Apple Intelligence **on**
+3. Set Mac language and Siri language to **English (US)**
+4. Wait for the on-device model to download
 
 ## Install
 
