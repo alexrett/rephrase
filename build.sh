@@ -1,6 +1,9 @@
 #!/bin/bash
 set -euo pipefail
 
+# Load signing config from .env.local (not committed to repo)
+[ -f .env.local ] && source .env.local
+
 # ── Config ────────────────────────────────────────────────
 APP_NAME="AiRephrase"
 BUNDLE_ID="com.malikov.ai-rephrase"
@@ -8,9 +11,9 @@ DISPLAY_NAME="AI Rephrase"
 MIN_OS="26.0"
 LSUIELEMENT="true"
 EXTRA_BUNDLES="KeyboardShortcuts_KeyboardShortcuts.bundle"  # space-separated resource bundles to copy
-# ── These come from your Keychain — no secrets in the repo ─
-IDENTITY="Developer ID Application: Alex Malikov (525W3628D2)"
-NOTARY_PROFILE="notarytool"
+# ── Signing identity (loaded from .env.local) ─
+IDENTITY="${IDENTITY:?Set IDENTITY in .env.local}"
+NOTARY_PROFILE="${NOTARY_PROFILE:-notarytool}"
 # ───────────────────────────────────────────────────────────
 
 APP="${APP_NAME}.app"
